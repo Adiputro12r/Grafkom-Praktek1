@@ -53,7 +53,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e3d5ba264934e2468ddd7b8aba15261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  treePrefab: {fileID: 7914974946514246411, guid: 7872c872e8bf0a14cbf314f1725973a6, type: 3}
+  treePrefab: {fileID: -8679921383154817045, guid: 20485d2395dc1c34c87d96fe2eb0f2dd, type: 3}
+  collectiblePrefabs:
+  - {fileID: 4560578374006309916, guid: 1bcba113adc8de14bbdc7c4e1f4652b1, type: 3}
+  - {fileID: 3449537897354921398, guid: b79d8daf8d090bc45805639fb85a18b3, type: 3}
+  - {fileID: 4487587684519087072, guid: 0d0a1c4a48a9fc4439b9901032ab03b4, type: 3}
+  collectibleSpawnChance: 0.5
 --- !u!1 &1565159045314590544
 GameObject:
   m_ObjectHideFlags: 0

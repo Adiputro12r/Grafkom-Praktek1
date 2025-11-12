@@ -13,15 +13,46 @@ public class GameManager : MonoBehaviour {
   [Header("Terrain objects")]
   [SerializeField] private Grass grassPrefab;
   [SerializeField] private Road roadPrefab;
+  [SerializeField] private Home homePrefab;
 
   [Header("Game parameters")]
   [SerializeField] private float moveDuration = 0.2f;
   [SerializeField] private int spawnDistance = 20;
 
+  [Header("Task System")]
+[SerializeField] private int plasticGoal = 10;
+[SerializeField] private int ironGoal = 5;
+[SerializeField] private int stickGoal = 8;
+
+private int plasticCollected = 5;
+private int ironCollected = 5;
+  private int stickCollected = 5;
+
+[Header("Canvas HUD Texts")]
+[SerializeField] private TMPro.TextMeshProUGUI plasticTaskText; // Teks HUD
+[SerializeField] private TMPro.TextMeshProUGUI ironTaskText; // Teks HUD
+[SerializeField] private TMPro.TextMeshProUGUI stickTaskText; // Teks HUD
+
+[Header("UI Panels")]
+[SerializeField] private GameObject gameOverPanel;
+[SerializeField] private GameObject winPanel;
+// Teks di panel Game Over (HANYA ANGKA)
+[Header("Game Over Panel Texts")]
+[SerializeField] private TMPro.TextMeshProUGUI gameOverPlasticText;
+[SerializeField] private TMPro.TextMeshProUGUI gameOverIronText;
+[SerializeField] private TMPro.TextMeshProUGUI gameOverStickText;
+
+// Teks di panel Menang (HANYA ANGKA)
+[Header("Win Panel Texts")]
+[SerializeField] private TMPro.TextMeshProUGUI winPlasticText;
+[SerializeField] private TMPro.TextMeshProUGUI winIronText;
+[SerializeField] private TMPro.TextMeshProUGUI winStickText;
+
   enum GameState {
     Ready,
     Moving,
-    Dead
+    Dead,
+    Won
   }
   private GameState gameState;
   private Vector2Int characterPos;
@@ -36,6 +67,16 @@ public class GameManager : MonoBehaviour {
 
   private void NewLevel() {
     gameState = GameState.Ready;
+
+    // Hide panels
+    if (gameOverPanel != null) gameOverPanel.SetActive(false);
+    if (winPanel != null) winPanel.SetActive(false);
+
+    // Reset task progress
+    plasticCollected = 0;
+    ironCollected = 0;
+    stickCollected = 0;
+    UpdateTaskUI(); // Reset teks HUD
 
     // Reset character position
     characterPos = new Vector2Int(0, -1);
@@ -63,16 +104,29 @@ public class GameManager : MonoBehaviour {
     // Spawn more roads the further we get, at 250 have 90% chance of a road.
     float roadProbability = Mathf.Lerp(0.5f, 0.9f, spawnLocation / 250f);
 
-    if (Random.value < roadProbability) {
+    if (Random.value < roadProbability)
+    {
       // Create road with terrain height of 0.1f.
       Road road = Instantiate(roadPrefab, terrainHolder);
       obstacles.Add((0.1f, road.Init(spawnLocation), road.gameObject));
       road.gameObject.name = $"{spawnLocation} - Road";
-    } else {
-      // Create grass with terrain height of 0.2f.
-      Grass grass = Instantiate(grassPrefab, terrainHolder);
-      obstacles.Add((0.2f, grass.Init(spawnLocation), grass.gameObject));
-      grass.gameObject.name = $"{spawnLocation} - Grass";
+    }
+    else
+    {
+      if (Random.value < 0.5f)
+      {
+        // Create grass with terrain height of 0.2f.
+        Grass grass = Instantiate(grassPrefab, terrainHolder);
+        obstacles.Add((0.2f, grass.Init(spawnLocation), grass.gameObject));
+        grass.gameObject.name = $"{spawnLocation} - Grass";
+      }
+      else
+      {
+        // Create home with terrain height of 0.2f.
+        Home home = Instantiate(homePrefab, terrainHolder);
+        obstacles.Add((0.2f, home.Init(spawnLocation), home.gameObject));
+        home.gameObject.name = $"{spawnLocation} - Home";
+      }
     }
 
     // Update to the next free location
@@ -93,19 +147,23 @@ public class GameManager : MonoBehaviour {
     if (gameState == GameState.Ready) {
       Vector2Int moveDirection = Vector2Int.zero;
       // Single if/else don't want to move diagonally.
-      if (Keyboard.current.upArrowKey.wasPressedThisFrame) {
+
+      // ---- PERUBAHAN DI SINI ----
+      // Mengganti .wasPressedThisFrame menjadi .isPressed
+      if (Keyboard.current.upArrowKey.isPressed) {
         character.localRotation = Quaternion.identity;
         moveDirection.y = 1;
-      } else if (Keyboard.current.downArrowKey.wasPressedThisFrame) {
+      } else if (Keyboard.current.downArrowKey.isPressed) {
         character.localRotation = Quaternion.Euler(0, 180, 0);
         moveDirection.y = -1;
-      } else if (Keyboard.current.leftArrowKey.wasPressedThisFrame) {
+      } else if (Keyboard.current.leftArrowKey.isPressed) {
         character.localRotation = Quaternion.Euler(0, -90, 0);
         moveDirection.x = -1;
-      } else if (Keyboard.current.rightArrowKey.wasPressedThisFrame) {
+      } else if (Keyboard.current.rightArrowKey.isPressed) {
         character.localRotation = Quaternion.Euler(0, 90, 0);
         moveDirection.x = 1;
       }
+      // --------------------------
 
       // If the user wants to move
       if (moveDirection != Vector2Int.zero) {
@@ -142,7 +200,8 @@ public class GameManager : MonoBehaviour {
     }
 
     // Can only use our shortcut to reset the level when we're dead.
-    if (gameState == GameState.Dead && Keyboard.current.spaceKey.wasPressedThisFrame) {
+    // Biarkan yang ini .wasPressedThisFrame agar tidak me-restart level terus menerus
+    if ((gameState == GameState.Dead || gameState == GameState.Won) && Keyboard.current.spaceKey.wasPressedThisFrame) {
       NewLevel();
     }
 
@@ -178,13 +237,7 @@ public class GameManager : MonoBehaviour {
 
       // Update the character position
       Vector3 newPos = Vector3.Lerp(startPos, endPos, percent);
-      // Make the character jump in an arc
-      newPos.y = yHeight + (0.5f * Mathf.Sin(Mathf.PI * percent));
       character.position = newPos;
-
-      // Update the model rotation
-      Vector3 rotation = characterModel.localRotation.eulerAngles;
-      characterModel.localRotation = Quaternion.Euler(-5f * Mathf.PI * Mathf.Cos(Mathf.PI * percent), rotation.y, rotation.z);
 
       // Update the elapsed time
       elapsedTime += Time.deltaTime;
@@ -203,8 +256,63 @@ public class GameManager : MonoBehaviour {
     }
   }
 
-  public void PlayerCollision() {
+  // 1. Dipanggil Character
+  public void CollectItem(CollectibleType type) {
+    if (gameState == GameState.Dead || gameState == GameState.Won) return;
+
+    if (type == CollectibleType.Plastic) plasticCollected++;
+    else if (type == CollectibleType.Iron) ironCollected++;
+    else if (type == CollectibleType.Stick) stickCollected++;
+
+    UpdateTaskUI();
+    CheckTaskCompletion();
+}
+
+// 2. Update Teks HUD (pojok layar)
+  private void UpdateTaskUI() {
+    if (plasticTaskText != null) plasticTaskText.text = $"{plasticCollected}/{plasticGoal}";
+    if (ironTaskText != null) ironTaskText.text = $"{ironCollected}/{ironGoal}";
+    if (stickTaskText != null) stickTaskText.text = $"{stickCollected}/{stickGoal}";
+  }
+
+// 3. Cek Kemenangan
+  private void CheckTaskCompletion() {
+    if (gameState == GameState.Won) return;
+    if (plasticCollected >= plasticGoal && ironCollected >= ironGoal && stickCollected >= stickGoal) {
+        gameState = GameState.Won;
+        ShowWinPanel();
+    }
+  }
+
+// 4. Tampilkan Panel (Kalah / Menang)
+  private void ShowGameOverPanel() {
+    gameOverPanel.SetActive(true);
+    UpdateFinalTrashText(); // Panggil fungsi skor akhir
+  }
+
+  private void ShowWinPanel() {
+    winPanel.SetActive(true);
+    UpdateFinalTrashText(); // Panggil fungsi skor akhir
+  }
+
+// 5. Update Teks Skor Akhir (Hanya Angka)
+  private void UpdateFinalTrashText() {
+    string plasticScore = $"{plasticCollected}/{plasticGoal}";
+    string ironScore = $"{ironCollected}/{ironGoal}";
+    string stickScore = $"{stickCollected}/{stickGoal}";
+
+    if (gameOverPlasticText != null) gameOverPlasticText.text = plasticScore;
+    if (gameOverIronText != null) gameOverIronText.text = ironScore;
+    if (gameOverStickText != null) gameOverStickText.text = stickScore;
+
+    if (winPlasticText != null) winPlasticText.text = plasticScore;
+    if (winIronText != null) winIronText.text = ironScore;
+    if (winStickText != null) winStickText.text = stickScore;
+  }
+public void PlayerCollision()
+  {
     // When we collide, we'll simply update the game state.
     gameState = GameState.Dead;
+    ShowGameOverPanel();
   }
 }
