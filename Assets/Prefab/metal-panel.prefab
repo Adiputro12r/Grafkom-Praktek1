@@ -244,7 +244,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 1
   rotationSpeed: 50
-  collectibleLight: {fileID: 0}
+  collectibleLight: {fileID: 79732208814300369}
   pulseSpeed: 10
   minIntensity: 10
   maxIntensity: 30
