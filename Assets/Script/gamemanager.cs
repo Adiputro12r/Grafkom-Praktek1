@@ -24,9 +24,9 @@ public class GameManager : MonoBehaviour {
 [SerializeField] private int ironGoal = 5;
 [SerializeField] private int stickGoal = 8;
 
-private int plasticCollected = 5;
-private int ironCollected = 5;
-  private int stickCollected = 5;
+private int plasticCollected = 0;
+private int ironCollected = 0;
+private int stickCollected = 0;
 
 [Header("Canvas HUD Texts")]
 [SerializeField] private TMPro.TextMeshProUGUI plasticTaskText; // Teks HUD
@@ -36,6 +36,7 @@ private int ironCollected = 5;
 [Header("UI Panels")]
 [SerializeField] private GameObject gameOverPanel;
 [SerializeField] private GameObject winPanel;
+[SerializeField] private GameObject tutorialPanelContainer;
 // Teks di panel Game Over (HANYA ANGKA)
 [Header("Game Over Panel Texts")]
 [SerializeField] private TMPro.TextMeshProUGUI gameOverPlasticText;
@@ -49,7 +50,8 @@ private int ironCollected = 5;
 [SerializeField] private TMPro.TextMeshProUGUI winStickText;
 
   enum GameState {
-    Ready,
+    Title,
+   Ready,
     Moving,
     Dead,
     Won
@@ -59,6 +61,7 @@ private int ironCollected = 5;
   private int spawnLocation;
   private List<(float terrainHeight, HashSet<int> locations, GameObject obj)> obstacles = new();
   private int score = 0;
+  private bool isGameActive = false;
 
   void Awake() {
     // Initialise all the starting state.
@@ -97,6 +100,28 @@ private int ironCollected = 5;
     spawnLocation = 0;
     for (int i = 0; i < spawnDistance; i++) {
       SpawnObstacle();
+    }
+    if (isGameActive) {
+      // Ini adalah RESTART, langsung main
+      gameState = GameState.Ready;
+      if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(false);
+    } 
+    else {
+      // Ini adalah PERTAMA KALI MAIN, kunci player & tampilkan tutorial
+      gameState = GameState.Title; // <-- Mengunci player
+      if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(true);
+    }
+  }
+
+  public void StartGameFromTutorial() {
+    if (gameState != GameState.Title) return; // Hanya jalan jika game masih terkunci
+
+    gameState = GameState.Ready;    // 1. Buka kunci player
+    isGameActive = true;            // 2. Tandai tutorial selesai
+    
+    // 3. Sembunyikan seluruh grup tutorial
+    if (tutorialPanelContainer != null) {
+      tutorialPanelContainer.SetActive(false);
     }
   }
 
@@ -150,16 +175,16 @@ private int ironCollected = 5;
 
       // ---- PERUBAHAN DI SINI ----
       // Mengganti .wasPressedThisFrame menjadi .isPressed
-      if (Keyboard.current.upArrowKey.isPressed) {
+      if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed) {
         character.localRotation = Quaternion.identity;
         moveDirection.y = 1;
-      } else if (Keyboard.current.downArrowKey.isPressed) {
+      } else if (Keyboard.current.downArrowKey.isPressed|| Keyboard.current.sKey.isPressed) {
         character.localRotation = Quaternion.Euler(0, 180, 0);
         moveDirection.y = -1;
-      } else if (Keyboard.current.leftArrowKey.isPressed) {
+      } else if (Keyboard.current.leftArrowKey.isPressed|| Keyboard.current.aKey.isPressed) {
         character.localRotation = Quaternion.Euler(0, -90, 0);
         moveDirection.x = -1;
-      } else if (Keyboard.current.rightArrowKey.isPressed) {
+      } else if (Keyboard.current.rightArrowKey.isPressed|| Keyboard.current.dKey.isPressed) {
         character.localRotation = Quaternion.Euler(0, 90, 0);
         moveDirection.x = 1;
       }
