@@ -35,7 +35,7 @@ private int stickCollected = 0;
 
 [Header("UI Panels")]
 [SerializeField] private GameObject gameOverPanel;
-[SerializeField] private GameObject winPanel;
+[SerializeField] private GameObject winPanel; 
 [SerializeField] private GameObject tutorialPanelContainer;
 // Teks di panel Game Over (HANYA ANGKA)
 [Header("Game Over Panel Texts")]
@@ -50,7 +50,7 @@ private int stickCollected = 0;
 [SerializeField] private TMPro.TextMeshProUGUI winStickText;
 
   enum GameState {
-    Title,
+    Tutorial,
    Ready,
     Moving,
     Dead,
@@ -65,6 +65,11 @@ private int stickCollected = 0;
 
   void Awake() {
     // Initialise all the starting state.
+    NewLevel();
+  }
+
+  /// Fungsi ini akan dipanggil oleh OnClick() Button di GameOverPanel dan WinPanel.
+  public void RestartGame() {
     NewLevel();
   }
 
@@ -108,21 +113,18 @@ private int stickCollected = 0;
     } 
     else {
       // Ini adalah PERTAMA KALI MAIN, kunci player & tampilkan tutorial
-      gameState = GameState.Title; // <-- Mengunci player
+      gameState = GameState.Tutorial; // <-- Mengunci player
       if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(true);
     }
   }
 
   public void StartGameFromTutorial() {
-    if (gameState != GameState.Title) return; // Hanya jalan jika game masih terkunci
+    if (gameState != GameState.Tutorial) return; // Hanya jalan jika game masih terkunci
 
     gameState = GameState.Ready;    // 1. Buka kunci player
     isGameActive = true;            // 2. Tandai tutorial selesai
     
-    // 3. Sembunyikan seluruh grup tutorial
-    if (tutorialPanelContainer != null) {
-      tutorialPanelContainer.SetActive(false);
-    }
+    
   }
 
   private void SpawnObstacle() {
@@ -226,9 +228,7 @@ private int stickCollected = 0;
 
     // Can only use our shortcut to reset the level when we're dead.
     // Biarkan yang ini .wasPressedThisFrame agar tidak me-restart level terus menerus
-    if ((gameState == GameState.Dead || gameState == GameState.Won) && Keyboard.current.spaceKey.wasPressedThisFrame) {
-      NewLevel();
-    }
+   
 
     // Camera follow at (+2, 4, -3)
     Vector3 cameraPosition = new(character.position.x + 2, 4, character.position.z - 3);
