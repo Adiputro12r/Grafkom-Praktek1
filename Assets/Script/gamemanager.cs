@@ -49,6 +49,7 @@ private int stickCollected = 0;
 [SerializeField] private TMPro.TextMeshProUGUI winIronText;
 [SerializeField] private TMPro.TextMeshProUGUI winStickText;
 
+
   enum GameState {
     Tutorial,
    Ready,
@@ -305,6 +306,7 @@ private int stickCollected = 0;
     if (gameState == GameState.Won) return;
     if (plasticCollected >= plasticGoal && ironCollected >= ironGoal && stickCollected >= stickGoal) {
         gameState = GameState.Won;
+        SoundManager.Instance.Play("Win");
         ShowWinPanel();
     }
   }

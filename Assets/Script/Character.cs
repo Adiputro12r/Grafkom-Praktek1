@@ -1,12 +1,10 @@
 using UnityEngine;
 
 public class Character : MonoBehaviour {
-  [SerializeField] private GameManager gameManager;
+  [SerializeField] private GameManager1 gameManager;
   [SerializeField] private GameObject character;
   [SerializeField] private ParticleSystem deathParticles;
-  
 
-  // Di dalam Character.cs
 
   private void OnTriggerEnter(Collider other) {
     // 1. Cek apakah objek yang disentuh punya tag "Collectible"
@@ -16,8 +14,13 @@ public class Character : MonoBehaviour {
         Collectible item = other.GetComponent<Collectible>();
         
         if (item != null) {
+            
+            //  SUARA COLLECTIBLE
+           SoundManager.Instance.Play("collect");
+            // ***************************************
+            
             // 3. Beri tahu GameManager item apa yang kita ambil
-            gameManager.CollectItem(item.type);
+            gameManager.TaskSystemRef.CollectItem(item.type);
             
             // 4. Hancurkan objek sampah agar hilang
             Destroy(other.gameObject);
@@ -33,6 +36,11 @@ public class Character : MonoBehaviour {
   }
 
   public void Kill(Vector3 collisionPoint) {
+    
+    // *** TAMBAHKAN INI UNTUK SUARA MATI/LOSE ***
+    SoundManager.Instance.Play("Lose");
+    // *******************************************
+    
     // Hide the character model
     character.SetActive(false);
 
