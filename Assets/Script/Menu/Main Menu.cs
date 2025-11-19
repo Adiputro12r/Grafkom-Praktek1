@@ -19,7 +19,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void PlayGame()
     {
-        SceneManager.LoadScene("Stage 1"); // menuju scene intro
+        SceneManager.LoadScene("Stage 2"); // menuju scene intro
     }
 
     public void QuitGame()

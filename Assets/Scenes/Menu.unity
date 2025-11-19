@@ -3307,7 +3307,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tracks:
   - trackName: Play
-    clip: {fileID: 8300000, guid: eb7f01c4d22784544a7b7c0c9ee48278, type: 3}
+    clip: {fileID: 8300000, guid: f9505c3431364a24da995a6151e46c3d, type: 3}
+  - trackName: Menu
+    clip: {fileID: 8300000, guid: 0eed3f00fff0ab641a729f43b120cf30, type: 3}
 --- !u!4 &743792529
 Transform:
   m_ObjectHideFlags: 0
