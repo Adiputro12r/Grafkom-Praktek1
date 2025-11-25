@@ -13254,8 +13254,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.3, y: 0.5, z: 0.71698517}
-  m_Center: {x: 0, y: 0.3, z: -0.06138566}
+  m_Size: {x: 0.3, y: 0.55050135, z: 0.71698517}
+  m_Center: {x: 0, y: 0.27474934, z: -0.06138566}
 --- !u!114 &1257668352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13269,7 +13269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 1782120536}
-  character: {fileID: 1257668348}
+  character: {fileID: 1423674995}
   deathParticles: {fileID: 1165898417}
 --- !u!114 &1257668353
 MonoBehaviour:
@@ -13283,8 +13283,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 599c2fb5181eb1a4a96603215962cb84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager1: {fileID: 1782120536}
+  gameManager: {fileID: 1782120536}
   characterModel: {fileID: 948340391}
+  characterScript: {fileID: 1257668352}
   moveDuration: 0.2
 --- !u!1001 &1259351750
 PrefabInstance:
@@ -14427,6 +14428,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1415290931}
   m_CullTransparentMesh: 1
+--- !u!1 &1423674995 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a61284f26e0543b4ca87570e0b3cc7ee, type: 3}
+  m_PrefabInstance: {fileID: 1229644896}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1428395302
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16062,6 +16068,7 @@ MonoBehaviour:
   grassPrefab: {fileID: -2060116531175741754, guid: dfdc65d7ba0e9bf4599c46fc02d8db6b, type: 3}
   roadPrefab: {fileID: -517346331047414886, guid: d347ca5066b87ea43bf0bae39de0a733, type: 3}
   homePrefab: {fileID: 4848859807275221351, guid: 5bae37fd08e50864bbfb9eb9aac0101d, type: 3}
+  riverPrefab: {fileID: -1203520548578006200, guid: 37aeec36b6f1b434e8c9c5cb5433932c, type: 3}
   spawnDistance: 20
   gameState: 0
 --- !u!114 &1782120537

@@ -19,6 +19,7 @@ public class GameManager1 : MonoBehaviour {
     [SerializeField] private Grass grassPrefab;
     [SerializeField] private Road roadPrefab;
     [SerializeField] private Home homePrefab;
+    [SerializeField] private River riverPrefab; // <--- TAMBAHKAN INI
 
     [Header("Game parameters")]
     [SerializeField] private int spawnDistance = 20;
@@ -97,26 +98,50 @@ public class GameManager1 : MonoBehaviour {
     }
 
     private void SpawnObstacle() {
-        // ... (Logika SpawnObstacle yang sama) ...
-        float roadProbability = Mathf.Lerp(0.5f, 0.9f, spawnLocation / 250f);
+    float prob = spawnLocation / 250f; 
+    float roadProbability = Mathf.Lerp(0.5f, 0.9f, prob);
 
-        if (Random.value < roadProbability) {
-            Road road = Instantiate(roadPrefab, terrainHolder);
-            obstacles.Add((0.1f, road.Init(spawnLocation), road.gameObject));
-            road.gameObject.name = $"{spawnLocation} - Road";
-        } else {
-            if (Random.value < 0.5f) {
-                Grass grass = Instantiate(grassPrefab, terrainHolder);
-                obstacles.Add((0.2f, grass.Init(spawnLocation), grass.gameObject));
-                grass.gameObject.name = $"{spawnLocation} - Grass";
-            } else {
-                Home home = Instantiate(homePrefab, terrainHolder);
-                obstacles.Add((0.2f, home.Init(spawnLocation), home.gameObject));
-                home.gameObject.name = $"{spawnLocation} - Home";
-            }
-        }
-        spawnLocation++;
+    // Kita modifikasi logika spawn agar River juga muncul
+    float rng = Random.value;
+
+    if (rng < roadProbability)
+    {
+      // --- LOGIKA PEMILIHAN ROAD ATAU RIVER ---
+      if (Random.value < 0.5f) 
+      {
+          // Spawn Road
+          Road road = Instantiate(roadPrefab, terrainHolder);
+          obstacles.Add((0.1f, road.Init(spawnLocation), road.gameObject));
+          road.gameObject.name = $"{spawnLocation} - Road";
+      }
+      else 
+      {
+          // Spawn River (BARU)
+          // Height diset 0.2f agar player melompat ke atas log, bukan ke dalam air
+          River river = Instantiate(riverPrefab, terrainHolder);
+          obstacles.Add((0.2f, river.Init(spawnLocation), river.gameObject));
+          river.gameObject.name = $"{spawnLocation} - River";
+      }
     }
+    else
+    {
+      // ... (Logika Grass dan Home tetap sama) ...
+      if (Random.value < 0.5f)
+        {
+        Grass grass = Instantiate(grassPrefab, terrainHolder);
+        obstacles.Add((0.2f, grass.Init(spawnLocation), grass.gameObject));
+        grass.gameObject.name = $"{spawnLocation} - Grass";
+        }
+         else
+        {
+        Home home = Instantiate(homePrefab, terrainHolder);
+        obstacles.Add((0.2f, home.Init(spawnLocation), home.gameObject));
+        home.gameObject.name = $"{spawnLocation} - Home";
+         }
+    }
+
+    spawnLocation++;
+  }
 
     // --- FUNGSI DIPANGGIL OLEH CharacterMovement ---
 
