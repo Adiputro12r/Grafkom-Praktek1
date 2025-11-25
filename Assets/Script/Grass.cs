@@ -4,76 +4,59 @@ using UnityEngine;
 public class Grass : MonoBehaviour
 {
     [SerializeField] private Transform treePrefab;
+    
+    private TaskSystem taskSystem;
 
-    [Header("Collectibles")]
-    [SerializeField] private List<GameObject> collectiblePrefabs; // Tempat menaruh prefab Plastic, Iron, Stick
-    [SerializeField] [Range(0, 1)] private float collectibleSpawnChance = 0.1f; // Peluang muncul (10%)
-
-    public HashSet<int> Init(float z)
+    private void Start()
     {
-        //place the obstacle at the location provided
+        // PERBAIKAN: Gunakan FindFirstObjectByType (Versi Baru)
+        taskSystem = FindFirstObjectByType<TaskSystem>();
+    }
+
+    public HashSet<int> Init(float z, float spawnChance)
+    {
+        // PERBAIKAN: Cek juga disini menggunakan perintah baru
+        if (taskSystem == null) taskSystem = FindFirstObjectByType<TaskSystem>();
+
         transform.position = new Vector3(0, 0, z);
-
-
-        //we always have obstacles outside the area
         HashSet<int> location = new() { -6, 6 };
 
-        //populate with some obstacles 
+        // 1. Spawn Pohon
         int numTrees = Random.Range(1, 5);
         for (int i = 0; i < numTrees; i++)
         {
-            //create new tree object
             Transform tree = Instantiate(treePrefab, transform);
-
-            //put tree at random location
             int xPos = Random.Range(-5, 6);
             tree.position = new Vector3(xPos, 0.1f, z);
-
-            //record the location in our HashSet
             location.Add(xPos);
-
-            // Decide whether to spawn a collectible
-
         }
-        if (Random.value < collectibleSpawnChance && collectiblePrefabs.Count > 0)
+
+        // 2. Spawn Collectible (Hanya jika task belum selesai)
+        if (Random.value < spawnChance)
         {
             int xPos = Random.Range(-5, 6);
-            int attempts = 0; // Penjaga agar tidak looping selamanya
+            int attempts = 0;
 
-            // Cari posisi X yang kosong (tidak ada pohon)
-            // Kita beri batas 10 kali percobaan
+            // Cari posisi kosong
             while (location.Contains(xPos) && attempts < 10)
             {
                 xPos = Random.Range(-5, 6);
                 attempts++;
             }
 
-            // Jika kita berhasil menemukan tempat kosong
-            if (!location.Contains(xPos))
+            // Pastikan taskSystem ketemu sebelum dipakai
+            if (!location.Contains(xPos) && taskSystem != null)
             {
-                // Pilih sampah secara acak dari daftar (Plastic, Iron, atau Stick)
-                int prefabIndex = Random.Range(0, collectiblePrefabs.Count);
-                GameObject prefabToSpawn = collectiblePrefabs[prefabIndex];
-                
-                // Munculkan sampah di lokasi tersebut
-                GameObject collectible = Instantiate(prefabToSpawn, transform);
-                collectible.transform.position = new Vector3(xPos, 0.5f, z);
-                
-                // PENTING: Kita *tidak* menambahkan 'xPos' ke 'location'
-                // Ini karena sampah bukan rintangan, pemain harus bisa melewatinya.
+                // Minta prefab sampah yang dibutuhkan dari TaskSystem
+                GameObject prefabToSpawn = taskSystem.GetNeededPrefab();
+
+                if (prefabToSpawn != null)
+                {
+                    GameObject collectible = Instantiate(prefabToSpawn, transform);
+                    collectible.transform.position = new Vector3(xPos, 0.5f, z);
+                }
             }
         }
         return location;
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
