@@ -16058,17 +16058,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a17e62afb37c7441abda022bdc29bae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelTerrains:
+  - name: 1
+    prefab: {fileID: 6105351270872562953, guid: 37aeec36b6f1b434e8c9c5cb5433932c, type: 3}
+    weight: 60
+    height: 0.2
+    collectibleChance: 0
+  - name: 2
+    prefab: {fileID: 6105351270872562953, guid: d347ca5066b87ea43bf0bae39de0a733, type: 3}
+    weight: 20
+    height: 0.1
+    collectibleChance: 0
+  - name: 3
+    prefab: {fileID: 1043813594739728572, guid: dfdc65d7ba0e9bf4599c46fc02d8db6b, type: 3}
+    weight: 10
+    height: 0.2
+    collectibleChance: 0.507
+  - name: 4
+    prefab: {fileID: 1043813594739728572, guid: 5bae37fd08e50864bbfb9eb9aac0101d, type: 3}
+    weight: 10
+    height: 0.2
+    collectibleChance: 0.507
   characterMovement: {fileID: 1257668353}
   taskSystem: {fileID: 1782120537}
   uiManager: {fileID: 2017667007}
   character: {fileID: 1257668349}
-  characterModel: {fileID: 948340391}
   terrainHolder: {fileID: 850159219}
   scoreText: {fileID: 1917481927}
-  grassPrefab: {fileID: -2060116531175741754, guid: dfdc65d7ba0e9bf4599c46fc02d8db6b, type: 3}
-  roadPrefab: {fileID: -517346331047414886, guid: d347ca5066b87ea43bf0bae39de0a733, type: 3}
-  homePrefab: {fileID: 4848859807275221351, guid: 5bae37fd08e50864bbfb9eb9aac0101d, type: 3}
-  riverPrefab: {fileID: -1203520548578006200, guid: 37aeec36b6f1b434e8c9c5cb5433932c, type: 3}
   spawnDistance: 20
   gameState: 0
 --- !u!114 &1782120537
@@ -16083,11 +16099,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7644122f81a903c4b871ba3cf5e3c6db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plasticGoal: 1
-  ironGoal: 1
-  stickGoal: 1
+  missions:
+  - name: BOTOL
+    type: 0
+    itemPrefab: {fileID: 4560578374006309916, guid: 1bcba113adc8de14bbdc7c4e1f4652b1, type: 3}
+    goal: 1
+    uiText: {fileID: 1108679157}
+    current: 0
+  - name: SENG
+    type: 1
+    itemPrefab: {fileID: 3449537897354921398, guid: b79d8daf8d090bc45805639fb85a18b3, type: 3}
+    goal: 1
+    uiText: {fileID: 91833872}
+    current: 0
+  - name: STICK
+    type: 2
+    itemPrefab: {fileID: 4487587684519087072, guid: 0d0a1c4a48a9fc4439b9901032ab03b4, type: 3}
+    goal: 1
+    uiText: {fileID: 1986814574}
+    current: 0
   gameManager1: {fileID: 1782120536}
-  uiManager: {fileID: 2017667007}
 --- !u!1001 &1813522072
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17500,18 +17531,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a85319eaf4e8a364f9c4fb063e0a78dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plasticTaskText: {fileID: 1108679157}
-  ironTaskText: {fileID: 91833872}
-  stickTaskText: {fileID: 1986814574}
   gameOverPanel: {fileID: 1292983753}
   winPanel: {fileID: 1761882213}
   tutorialPanelContainer: {fileID: 375821558}
-  gameOverPlasticText: {fileID: 2042713317}
-  gameOverIronText: {fileID: 352700537}
-  gameOverStickText: {fileID: 1334213812}
-  winPlasticText: {fileID: 633339075}
-  winIronText: {fileID: 1099752708}
-  winStickText: {fileID: 1103143697}
+  nextStageName: Stage 2
   gameManager: {fileID: 1782120536}
 --- !u!1001 &2023549608
 PrefabInstance:

@@ -4,7 +4,15 @@ using UnityEngine;
 public enum CollectibleType {
     Plastic,
     Iron,
-    Stick
+    Stick,
+    karton,
+    Oli,
+    jarum,
+
+    komputer
+
+
+
 }
 
 public class Collectible : MonoBehaviour

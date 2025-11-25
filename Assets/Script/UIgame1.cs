@@ -1,28 +1,20 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // Wajib untuk pindah scene
 
-public class UIManager1 : MonoBehaviour {
-    [Header("Canvas HUD Texts")]
-    [SerializeField] private TMPro.TextMeshProUGUI plasticTaskText; // Teks HUD
-    [SerializeField] private TMPro.TextMeshProUGUI ironTaskText; // Teks HUD
-    [SerializeField] private TMPro.TextMeshProUGUI stickTaskText; // Teks HUD
-
+public class UIManager1 : MonoBehaviour
+{
     [Header("UI Panels")]
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private GameObject winPanel; 
     [SerializeField] private GameObject tutorialPanelContainer;
 
-    [Header("Game Over Panel Texts")]
-    [SerializeField] private TMPro.TextMeshProUGUI gameOverPlasticText;
-    [SerializeField] private TMPro.TextMeshProUGUI gameOverIronText;
-    [SerializeField] private TMPro.TextMeshProUGUI gameOverStickText;
-
-    [Header("Win Panel Texts")]
-    [SerializeField] private TMPro.TextMeshProUGUI winPlasticText;
-    [SerializeField] private TMPro.TextMeshProUGUI winIronText;
-    [SerializeField] private TMPro.TextMeshProUGUI winStickText;
+    [Header("Settings")]
+    [SerializeField] private string nextStageName; // Nama Scene selanjutnya
 
     [Header("References")]
     [SerializeField] private GameManager1 gameManager;
+
+    // --- LOGIKA PANEL (TANPA ARGUMEN) ---
 
     public void HideAllPanels() {
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
@@ -30,56 +22,46 @@ public class UIManager1 : MonoBehaviour {
         if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(false);
     }
     
-    public void HideTutorialPanel() {
-        if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(false);
-    }
-    
     public void ShowTutorialPanel() {
         if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(true);
     }
 
-    // Dipanggil dari TaskSystem
-    public void UpdateTaskUI(TaskSystem.TaskProgress progress) {
-        if (plasticTaskText != null) plasticTaskText.text = $"{progress.plastic}/{progress.plasticG}";
-        if (ironTaskText != null) ironTaskText.text = $"{progress.iron}/{progress.ironG}";
-        if (stickTaskText != null) stickTaskText.text = $"{progress.stick}/{progress.stickG}";
+    public void HideTutorialPanel() {
+        if (tutorialPanelContainer != null) tutorialPanelContainer.SetActive(false);
     }
 
-    public void ShowGameOverPanel(TaskSystem.TaskProgress progress) {
-        gameOverPanel.SetActive(true);
-        UpdateFinalTrashText(progress);
+    // Dipanggil GameManager saat Kalah
+    public void ShowGameOverPanel() {
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
     }
 
-    public void ShowWinPanel(TaskSystem.TaskProgress progress) {
+    // Dipanggil GameManager saat Menang
+    public void ShowWinPanel() {
         SoundManager.Instance.Play("Win");
-        winPanel.SetActive(true);
-        UpdateFinalTrashText(progress);
+        if (winPanel != null) winPanel.SetActive(true);
     }
 
-    // Dipanggil saat game berakhir (Menang/Kalah)
-    private void UpdateFinalTrashText(TaskSystem.TaskProgress progress) {
-        string plasticScore = $"{progress.plastic}/{progress.plasticG}";
-        string ironScore = $"{progress.iron}/{progress.ironG}";
-        string stickScore = $"{progress.stick}/{progress.stickG}";
+    // --- FUNGSI TOMBOL ---
 
-        if (gameOverPlasticText != null) gameOverPlasticText.text = plasticScore;
-        if (gameOverIronText != null) gameOverIronText.text = ironScore;
-        if (gameOverStickText != null) gameOverStickText.text = stickScore;
-
-        if (winPlasticText != null) winPlasticText.text = plasticScore;
-        if (winIronText != null) winIronText.text = ironScore;
-        if (winStickText != null) winStickText.text = stickScore;
-    }
-    
-    // Fungsi ini harus dihubungkan ke Button Restart di Inspector
     public void OnRestartButtonClick()
     {
         gameManager.RestartGame();
     }
     
-    // Fungsi ini harus dihubungkan ke Button Start di Tutorial Panel
     public void OnTutorialStartButtonClick()
     {
         gameManager.StartGameFromTutorial();
+    }
+
+    public void OnNextStageButtonClick()
+    {
+        if(!string.IsNullOrEmpty(nextStageName))
+        {
+            SceneManager.LoadScene(nextStageName);
+        }
+        else
+        {
+            Debug.Log("Nama Next Stage belum diisi di Inspector UIManager!");
+        }
     }
 }
