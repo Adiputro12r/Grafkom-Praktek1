@@ -57,11 +57,17 @@ public class MusicManager : MonoBehaviour
 
         switch (sceneName)
         {
-            case "Stage 2":
-                PlayMusic("Play");
-                break;
             case "Menu":
                 PlayMusic("Menu");
+                break;
+            case "Level 1":
+                PlayMusic("Level 1");
+                break;
+            case "Level 2":
+                PlayMusic("Level 2");
+                break;
+            case "Level 3":
+                PlayMusic("Level 3");
                 break;
             default:
                 Debug.Log("No matching music for scene: " + sceneName);

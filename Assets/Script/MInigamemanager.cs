@@ -59,6 +59,7 @@ public class MinigameManager : MonoBehaviour
         
         // Tampilkan peringatan positif
         ShowFeedback(true);
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.soundLibrary.GetClipFromName("collect"));
 
         if (jumlahBenar >= jumlahSampahTotal)
         {
@@ -75,6 +76,7 @@ public class MinigameManager : MonoBehaviour
     {
         // Tampilkan peringatan negatif
         ShowFeedback(false);
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.soundLibrary.GetClipFromName("Lose"));
     }
 
     void UpdateUI()
@@ -117,6 +119,7 @@ public class MinigameManager : MonoBehaviour
         if(textFeedback != null) 
         {
             textFeedback.gameObject.SetActive(true);
+            SoundManager.Instance.PlaySFX(SoundManager.Instance.soundLibrary.GetClipFromName("Win"));
             textFeedback.text = "SELESAI!";
             textFeedback.color = Color.yellow;
         }
