@@ -1,17 +1,27 @@
 using UnityEngine;
+using System.Collections; // Untuk Coroutine (Timer peringatan)
 using System.Collections.Generic;
+using TMPro;
 
 public class MinigameManager : MonoBehaviour
 {
-    public static MinigameManager Instance; // Singleton sederhana
+    public static MinigameManager Instance;
 
     [Header("Settings")]
-    public List<GameObject> trashPrefabs; // Masukkan prefab sampah di sini
-    public List<Transform> spawnPoints;   // Masukkan posisi spawn (Empty GameObject di UI)
-    public GameObject nextStageButton;    // Tombol Next Stage
+    public List<GameObject> trashPrefabs;
+    public Transform spawnPoint;
+    public GameObject nextStageButton;
 
-    private int totalTrash;
-    private int collectedTrash = 0;
+    [Header("UI References")]
+    public TextMeshProUGUI textBenar;      // Teks: "Dipilah: 0"
+    public TextMeshProUGUI textTotal;      // Teks: "Target: 5"
+    public TextMeshProUGUI textFeedback;   // Teks Peringatan: "BENAR!" / "SALAH!"
+
+    [Header("Level Config")]
+    public int jumlahSampahTotal = 5;
+
+    private int jumlahBenar = 0;
+    private GameObject currentTrashObject;
 
     void Awake()
     {
@@ -20,57 +30,96 @@ public class MinigameManager : MonoBehaviour
 
     void Start()
     {
-        nextStageButton.SetActive(false); // Sembunyikan tombol di awal
-        SpawnTrash();
+        nextStageButton.SetActive(false);
+        jumlahBenar = 0;
+
+        // Sembunyikan teks peringatan di awal
+        if(textFeedback != null) textFeedback.gameObject.SetActive(false);
+
+        UpdateUI(); 
+        SpawnNewTrash();
     }
 
-    void SpawnTrash()
+    public void SpawnNewTrash()
     {
-        // Hitung ada berapa titik spawn yang tersedia
-        int numberOfSlots = spawnPoints.Count;
-        
-        // Update total sampah yang harus diselesaikan player sesuai jumlah slot
-        totalTrash = numberOfSlots;
+        int randomIndex = Random.Range(0, trashPrefabs.Count);
+        GameObject selectedPrefab = trashPrefabs[randomIndex];
 
-        // Loop sebanyak jumlah TEMPAT SPAWN, bukan jumlah prefab
-        for (int i = 0; i < numberOfSlots; i++)
-        {
-            // --- BAGIAN KUNCI ---
-            // Kita ambil satu prefab secara acak dari list 'trashPrefabs'
-            // Walaupun list isinya cuma 1 (misal Apel), dia akan terambil terus menerus.
-            int randomIndex = Random.Range(0, trashPrefabs.Count);
-            GameObject prefabToSpawn = trashPrefabs[randomIndex];
-            
-            // ---------------------
-
-            // Spawn sampah di posisi spawn point ke-i
-            GameObject newTrash = Instantiate(prefabToSpawn, spawnPoints[i].position, Quaternion.identity);
-            
-            // Atur parent ke spawn point agar rapi
-            newTrash.transform.SetParent(spawnPoints[i]);
-            
-            // Reset skala (penting untuk UI)
-            newTrash.transform.localScale = Vector3.one; 
-        }
-     
-    // Update total sampah yang harus dimasukkan player
-    totalTrash = spawnPoints.Count;
+        currentTrashObject = Instantiate(selectedPrefab, spawnPoint.position, Quaternion.identity);
+        currentTrashObject.transform.SetParent(spawnPoint);
+        currentTrashObject.transform.localScale = Vector3.one;
+        currentTrashObject.transform.localPosition = Vector3.zero;
     }
 
-    public void CheckProgress()
+    // Dipanggil saat sampah masuk ke tong yang BENAR
+    public void OnTrashCorrect()
     {
-        collectedTrash++;
+        jumlahBenar++;
+        UpdateUI();
         
-        // Cek apakah semua sampah sudah masuk
-        if (collectedTrash >= totalTrash)
+        // Tampilkan peringatan positif
+        ShowFeedback(true);
+
+        if (jumlahBenar >= jumlahSampahTotal)
         {
             GameFinished();
         }
+        else
+        {
+            SpawnNewTrash();
+        }
+    }
+
+    // Dipanggil saat sampah masuk ke tong yang SALAH
+    public void OnTrashWrong()
+    {
+        // Tampilkan peringatan negatif
+        ShowFeedback(false);
+    }
+
+    void UpdateUI()
+    {
+        if (textBenar != null) textBenar.text = $"Dipilah: {jumlahBenar}";
+        if (textTotal != null) textTotal.text = $"Target: {jumlahSampahTotal}";
+    }
+
+    // Fungsi untuk memunculkan teks peringatan sesaat
+    void ShowFeedback(bool isSuccess)
+    {
+        if (textFeedback == null) return;
+
+        textFeedback.gameObject.SetActive(true);
+
+        if (isSuccess)
+        {
+            textFeedback.text = "BENAR!";
+            textFeedback.color = Color.green; // Warna Hijau
+        }
+        else
+        {
+            textFeedback.text = "SALAH TEMPAT!";
+            textFeedback.color = Color.red;   // Warna Merah
+        }
+
+        // Mulai timer untuk menyembunyikan teks
+        StopAllCoroutines();
+        StartCoroutine(HideFeedbackDelay());
+    }
+
+    IEnumerator HideFeedbackDelay()
+    {
+        yield return new WaitForSeconds(1.5f); // Teks muncul selama 1.5 detik
+        textFeedback.gameObject.SetActive(false);
     }
 
     void GameFinished()
     {
-        Debug.Log("Level Selesai!");
-        nextStageButton.SetActive(true); // Munculkan tombol
+        if(textFeedback != null) 
+        {
+            textFeedback.gameObject.SetActive(true);
+            textFeedback.text = "SELESAI!";
+            textFeedback.color = Color.yellow;
+        }
+        nextStageButton.SetActive(true);
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class TrashBin : MonoBehaviour, IDropHandler
 {
-    public TrashType2d acceptedType; // Tentukan tipe yang diterima bin ini
+    public TrashType2d acceptedType;
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -14,15 +14,20 @@ public class TrashBin : MonoBehaviour, IDropHandler
         {
             if (trash.type == acceptedType)
             {
-                // BENAR: Hancurkan sampah dan lapor ke Manager
-                Debug.Log("Sampah Benar!");
-                MinigameManager.Instance.CheckProgress();
+                // --- KONDISI BENAR ---
+                // Panggil fungsi Benar di Manager
+                MinigameManager.Instance.OnTrashCorrect();
+                
+                // Hancurkan sampah
                 Destroy(droppedObj);
             }
             else
             {
-                // SALAH: Kembalikan ke tempat spawn
-                Debug.Log("Salah Tempat!");
+                // --- KONDISI SALAH ---
+                // Panggil fungsi Salah di Manager (untuk menampilkan teks peringatan)
+                MinigameManager.Instance.OnTrashWrong();
+                
+                // Kembalikan sampah ke tempat asal
                 trash.ResetPosition();
             }
         }
